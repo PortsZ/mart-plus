@@ -14,12 +14,12 @@ const options: NextAuthOptions = {
         username: {
           label: "Username:",
           type: "text",
-          placeholder: "your-username",
+          placeholder: "admin",
         },
         password: {
           label: "Password:",
           type: "password",
-          placeholder: "your-password",
+          placeholder: "admin",
         },
       },
       async authorize(credentials) {
