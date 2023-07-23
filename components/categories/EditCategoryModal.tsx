@@ -1,7 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import { categories } from "@/data/categories";
 
 interface Category {
     id: number;
@@ -12,11 +11,13 @@ interface Category {
 interface EditProductModalProps {
   setModalOpen: (isOpen: boolean) => void;
   updateCategory: (category: Category) => void;
+  removeCategory:(id:number)=>void;
   category: Category;
 }
 
 const EditCategoryModal: React.FC<EditProductModalProps> = ({
   setModalOpen,
+  removeCategory,
   updateCategory,
   category,
 }) => {
@@ -28,16 +29,22 @@ const EditCategoryModal: React.FC<EditProductModalProps> = ({
     defaultValues: {
       name: category.name,
       id: category.id,
-      tax: category.tax,
+      tax: category.tax*100,
     },
   });
+
+
+  const handleRemoveCategory = (id:number) => {
+    removeCategory(id)
+    setModalOpen(false); 
+  };
+
 
   const onSubmit = (data: Category) => {
     const updatedCategory: Category = {
       ...category,
       name: data.name,
-      id: data.id,
-      tax: data.tax,
+      tax: data.tax/100,
     };
     updateCategory(updatedCategory);
     setModalOpen(false);
@@ -49,8 +56,8 @@ const EditCategoryModal: React.FC<EditProductModalProps> = ({
         className="bg-background p-6 rounded"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <h2 className="mb-4 text-lg font-sleek text-dark">Edit Product</h2>
-
+        <h2 className="mb-4 text-lg font-sleek text-dark">Edit Category</h2>
+        <label>Category Name</label>
         <input
           className="bg-background rounded text-black px-2 py-1 w-full border-[1px] border-dark border-opacity-40
                 focus:outline-none focus:ring-1 focus:ring-dark focus:border-transparent mb-4"
@@ -58,15 +65,12 @@ const EditCategoryModal: React.FC<EditProductModalProps> = ({
           {...register("name", { required: "Product name is required" })}
         />
         {errors.name && <p>{errors.name.message}</p>}
-
+        <label>Tax Value (%)</label>
         <input
           className="bg-background rounded text-black px-2 py-1 w-full border-[1px] border-dark border-opacity-40
                 focus:outline-none focus:ring-1 focus:ring-dark focus:border-transparent mb-4"
           placeholder="Tax"
           type="number"
-          step="0.001"
-          min="0"
-          max="1"
           {...register("tax", {
             required: "Tax is required",
             
@@ -82,6 +86,15 @@ const EditCategoryModal: React.FC<EditProductModalProps> = ({
           type="submit"
         >
           Update Product
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.94 }}
+          whileHover={{ scale: 1.06 }}
+          className="px-4 py-2 ml-2 bg-red-500 bg-opacity-90 text-dark rounded"
+          type="button"
+          onClick={()=>{handleRemoveCategory(category.id)}} // Add the onClick event for the Remove button
+        >
+          Remove Product
         </motion.button>
         <motion.button
           whileTap={{ scale: 0.94 }}

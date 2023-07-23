@@ -21,23 +21,50 @@ const Categories = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
 
-  const handleaddCategoryClick = () => {
+  const [nextCategoryId, setNextCategoryId] = useState<number>(0);
+
+  const handleAddCategoryClick = () => {
     setModalOpen(true);
   };
 
 
-  const addCategory = (product:any) => {
-    setCategories((prevCategories) => [...prevCategories, product]);
+  const addCategory = (product: Category) => {
+    const newCategory: Category = {
+      ...product,
+      id: nextCategoryId, // Use the next available ID
+    };
+    setCategories((prevCategories) => [...prevCategories, newCategory]);
+    setNextCategoryId((prevNextCategoryId) => prevNextCategoryId + 1); // Increment the next available ID
   };
 
+  const removeCategory = (id:number) => {
+    setCategories((prevCategories) =>
+      prevCategories.filter((category) => category.id !== id)
+    );
+  };
+  
+  const updateCategory = (updatedCategory: Category) => {
+    setCategories((prevCategories) =>
+      prevCategories.map((category) =>
+        category.id === updatedCategory.id ? updatedCategory : category
+      )
+    );
+  };
+  useEffect(() => {
+    let maxId = 0;
+    categories.forEach((category: Category) => {
+      if (category.id > maxId) {
+        maxId = category.id;
+      }
+    });
+    setNextCategoryId(maxId + 1);
+  }, [categories]);
 
 
   useEffect(() => {
     const result = categories.filter(
       (product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) 
-        //||
-        // product.tax.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredCategories(result);
   }, [searchQuery, categories]);
@@ -75,14 +102,14 @@ const Categories = () => {
               <motion.button
                 whileTap={{ scale: 0.94 }}
                 whileHover={{ scale: 1.06 }}
-                onClick={handleaddCategoryClick}
+                onClick={handleAddCategoryClick}
                 className="bg-highlight text-black rounded-md px-4 py-2 font-sleek font-normal"
               >
                 Add Category
               </motion.button>
             </div>
 
-            <CategoriesTable categories={filteredCategories}/>
+            <CategoriesTable updateCategory={updateCategory} removeCategory={removeCategory} categories={filteredCategories}/>
           </div>
         </CategoriesCard>
       </motion.div>

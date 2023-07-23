@@ -1,28 +1,27 @@
 import React, {useState} from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import { categories } from "@/data/categories";
 
-interface IProduct {
+interface Category {
   name: string;
-  price: number;
-  category: string;
+  tax: number;
+  id: number;
 }
 
 
 
-const CategoriesModal = ({ setModalOpen, addProduct, products }:any) => {
+const CategoriesModal = ({ setModalOpen, addCategory, categories }:any) => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
-  } = useForm<IProduct>();
+  } = useForm<Category>();
 
-  const onSubmit = (data: IProduct) => {
-    console.log(data);
-    const newProduct = { ...data, id: products.length + 1 };
-    addProduct(newProduct);
-    // after successfully adding the product, you might want to close the modal:
+  const onSubmit = (data: Category) => {
+
+    const newCategory = { name: data.name, tax:data.tax/100, id: categories.length + 1 };
+    addCategory(newCategory);
     setModalOpen(false);
   };
 
@@ -32,40 +31,26 @@ const CategoriesModal = ({ setModalOpen, addProduct, products }:any) => {
         className="bg-background p-6 rounded"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <h2 className="mb-4 text-lg font-sleek text-dark">Add Product</h2>
+        <h2 className="mb-4 text-lg font-sleek text-dark">Add Category</h2>
 
         <input
           className="bg-background rounded text-black px-2 py-1 w-full border-[1px] border-dark border-opacity-40
                 focus:outline-none focus:ring-1 focus:ring-dark focus:border-transparent mb-4"
           placeholder="Name"
-          {...register("name", { required: "Product name is required" })}
+          {...register("name", { required: "Category name is required" })}
         />
         {errors.name && <p>{errors.name.message}</p>}
 
         <input
           className="bg-background rounded text-black px-2 py-1 w-full border-[1px] border-dark border-opacity-40
                 focus:outline-none focus:ring-1 focus:ring-dark focus:border-transparent mb-4"
-          placeholder="Price"
+          placeholder="tax in %"
           type="number"
-          {...register("price", { required: "Product price is required" })}
+          {...register("tax", { required: "Category tax is required" })}
         />
-        {errors.price && <p>{errors.price.message}</p>}
+        {errors.tax && <p>{errors.tax.message}</p>}
 
-        <select
-          className="bg-background rounded text-black px-2 py-1 w-full border-[1px] border-dark border-opacity-40
-              focus:outline-none focus:ring-1 focus:ring-dark focus:border-transparent mb-4"
-          {...register("category", {
-            required: "Product category is required",
-          })}
-        >
-          <option value="">Select category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.name}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        {errors.category && <p>{errors.category.message}</p>}
+        
 
         <motion.button
           whileTap={{ scale: 0.94 }}
@@ -74,7 +59,7 @@ const CategoriesModal = ({ setModalOpen, addProduct, products }:any) => {
           type="button"
             onClick={handleSubmit(onSubmit)}
         >
-          Add Product
+          Add Category
         </motion.button>
         <motion.button
           whileTap={{ scale: 0.94 }}

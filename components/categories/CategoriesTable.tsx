@@ -9,7 +9,7 @@ interface Category {
   tax: number;
 }
 
-const CategoriesTable = ({ categories }: any) => {
+const CategoriesTable = ({updateCategory, removeCategory, categories }: any) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
@@ -21,9 +21,7 @@ const CategoriesTable = ({ categories }: any) => {
     }
   };
 
-  const updateCategory = (category: Category) => {
-    console.log(category.id);
-  };
+
 
   return (
     <div className="p-4 rounded  w-full">
@@ -31,11 +29,11 @@ const CategoriesTable = ({ categories }: any) => {
         <thead className="w-full border-b-4 ">
           <tr className=" rounded">
             <th className="text-left text-black font-sleek font-normal">
-              Name
+              Category Name
             </th>
 
             <th className="text-left text-black font-sleek font-normal">
-              Category
+              Tax
             </th>
             <th className="text-right text-black font-sleek font-normal">
               Action
@@ -85,6 +83,7 @@ const CategoriesTable = ({ categories }: any) => {
           setModalOpen={setEditModalOpen}
           category={selectedCategory}
           updateCategory={updateCategory} 
+          removeCategory={removeCategory}
         />
       )}
     </div>
