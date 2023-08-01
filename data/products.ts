@@ -20,4 +20,11 @@ export const products = [
     category: "Sweets",
     category_id: 3,
   },
+  {
+    id: 4,
+    name: "Roberto",
+    price: 4,
+    category: "Pizza",
+    category_id: 3,
+  },
 ];
