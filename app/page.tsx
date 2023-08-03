@@ -1,6 +1,4 @@
 "use client";
-
-import Create from "@/components/create/Create";
 import Header from "@/components/header/Header";
 import React, { useState } from "react";
 import Cart from "@/components/cart/Cart";
@@ -85,27 +83,15 @@ export default function Home() {
         </nav>
 
         {selectedTab === "home" && (
-          <Cart
-            cart={cart}
-            removeFromCart={removeFromCart}
-            reduceFromCart={reduceFromCart}
-          />
+          <Cart/>
         )}
         {selectedTab === "products" && <Products />}
         {selectedTab === "categories" && <Categories />}
 
         <AnimatePresence>
-          {selectedTab === "home" && (
-            <motion.div
-              key="modal"
-              initial={{ opacity: 0, y: 25 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 25 }}
-              className="fixed bottom-0 right-0 z-50"
-            >
-              <Create addToCart={addToCart} products={products} />
-            </motion.div>
-          )}
+          {/* {selectedTab === "home" && (
+            
+          )} */}
         </AnimatePresence>
       </main>
     );

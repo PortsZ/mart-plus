@@ -1,29 +1,50 @@
-import React, {useState} from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import { categories } from "@/data/categories";
+import { createProduct, getProducts } from "./getProducts";
+import { getCategories } from "../categories/getCategories";
 
-interface IProduct {
+interface Category {
+  id?: number;
   name: string;
-  price: number;
-  category: string;
+  tax: number;
 }
 
+interface Product {
+  name: string;
+  price: number;
+  category: Category;
+}
 
-
-const ProductModal = ({ setModalOpen, addProduct, products }:any) => {
+const ProductModal = ({ setModalOpen, setUpdateProduct }: any) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IProduct>();
+  } = useForm<Product>();
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  const onSubmit = (data: IProduct) => {
-    console.log(data);
-    const newProduct = { ...data, id: products.length + 1 };
-    addProduct(newProduct);
-    // after successfully adding the product, you might want to close the modal:
-    setModalOpen(false);
+  useEffect(() => {
+    getCategories().then((data) => {
+      setCategories(data);
+    });
+  }, []);
+
+  const onSubmit = async (data: Product) => {
+    const newProduct = {
+      name: data.name,
+      price: Number(data.price),
+      categoryId: data.category,
+    };
+
+    await createProduct(newProduct).then(() => {      
+      setModalOpen(false);
+    });
+    await getProducts().then(() => {
+      setUpdateProduct(true);
+    })
+    
   };
 
   return (
@@ -59,11 +80,12 @@ const ProductModal = ({ setModalOpen, addProduct, products }:any) => {
           })}
         >
           <option value="">Select category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.name}>
-              {category.name}
-            </option>
-          ))}
+          {categories &&
+            categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
         </select>
         {errors.category && <p>{errors.category.message}</p>}
 
@@ -72,7 +94,7 @@ const ProductModal = ({ setModalOpen, addProduct, products }:any) => {
           whileHover={{ scale: 1.06 }}
           className="px-4 py-2 bg-highlight text-dark rounded"
           type="button"
-            onClick={handleSubmit(onSubmit)}
+          onClick={handleSubmit(onSubmit)}
         >
           Add Product
         </motion.button>

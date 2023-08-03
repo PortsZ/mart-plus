@@ -1,20 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  category_id: number;
-  quantity?: number;
-}
+import { updateCartItem, deleteCartItem } from "./getCartItems";
+import { useCartStore } from "@/stores/updateCartStore";
 
 interface CartModalProps {
-  product: Product;
-  removeFromCart: (productID: number) => void;
-  reduceFromCart: (productID: number, quantity: number) => void;
+  product: CartItem;
   closeModal: () => void;
 }
 
@@ -24,8 +15,6 @@ interface IFormInput {
 
 const CartDeleteModal: React.FC<CartModalProps> = ({
   product,
-  removeFromCart,
-  reduceFromCart,
   closeModal,
 }) => {
   const {
@@ -34,38 +23,42 @@ const CartDeleteModal: React.FC<CartModalProps> = ({
     handleSubmit,
     formState: { errors },
   } = useForm<IFormInput>();
-
+  const [modifyProduct, setModifyProduct] = useState<Product>();
   const [error, setError] = useState("");
+  const quantity = watch("quantity");
+  const setUpdateCart = useCartStore((state) => state.setUpdateCart);
 
-  const onSubmit = (data: IFormInput) => {
+  //
+  //
+  //
+  // EFFECTS ================================
+  useEffect(() => {
+    console.log(product)
     
+  }, []);
 
-    if (data.quantity >= (product.quantity || 0)) {
-      removeFromCart(product.id);
+  // EFFECTS ================================
+  //
+  //
+  //
+
+  const onSubmit = async(data: IFormInput) => {
+   
+      const updateProd = {
+        ...product,
+        quantity: Number(data.quantity),
+      }
+      await updateCartItem(updateProd);
+      setUpdateCart(true)
       closeModal();
-    } else {
-      reduceFromCart(product.id, data.quantity);
-      closeModal();
-    }
+    
   };
 
-  const quantity = watch("quantity");
-
-
   useEffect(() => {
-    if (
-      Number(quantity) <= 0 ||
-      quantity === undefined ||
-      quantity === null
-    ) {
-      setError(
-        "Quantity must be at least 1"
-      );
+    if (Number(quantity) <= 0 || quantity === undefined || quantity === null) {
+      setError("Quantity must be at least 1");
     } else setError("");
-  
-    
-  }, [quantity])
-  
+  }, [quantity]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center ">
@@ -88,7 +81,7 @@ const CartDeleteModal: React.FC<CartModalProps> = ({
           >
             <div>
               <label className="text-dark" htmlFor="quantity">
-                Quantity to remove:
+                New Quantity:
               </label>
               <div
                 className="bg-background flex rounded text-black px-2 py-1 w-full border-[1px] border-dark border-opacity-40
@@ -109,7 +102,8 @@ const CartDeleteModal: React.FC<CartModalProps> = ({
                   whileTap={{ scale: 0.95 }}
                   type="button"
                   onClick={() => {
-                    removeFromCart(product.id);
+                    deleteCartItem(product.id as number);
+                    setUpdateCart(true)
                     closeModal();
                   }}
                   className="bg-highlight text-black rounded-md p-1 w-1/2"
@@ -118,9 +112,7 @@ const CartDeleteModal: React.FC<CartModalProps> = ({
                 </motion.button>
               </div>
               {error && (
-                <p className="text-red-500 text-xs text-left">
-                  {error}
-                </p>
+                <p className="text-red-500 text-xs text-left">{error}</p>
               )}
             </div>
             <div className="flex px-5 justify-end w-full">

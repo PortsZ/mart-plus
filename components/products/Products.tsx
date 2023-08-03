@@ -5,44 +5,43 @@ import { AnimatePresence, motion } from "framer-motion";
 import ProductsCard from "./ProductsCard";
 import ProductsTable from "./ProductsTable";
 import ProductModal from "./ProductModal";
-
-import { products as initialProducts } from "@/data/products";
+import { getProducts } from "./getProducts";
 import SearchBar from "../search/SearchBar";
 
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  category_id: number;
-}
-
 const Products = () => {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [updateProduct, setUpdateProduct] = useState<Product | null>(null);
+  //
+  //
+  //
+  // USE EFFECTS===============================================================
 
-  const handleAddProductClick = () => {
-    setModalOpen(true);
-  };
-
-
-  const addProduct = (product:any) => {
-    setProducts((prevProducts) => [...prevProducts, product]);
-  };
-
-
+  useEffect(() => {
+    getProducts().then((data) => {
+      setProducts(data);
+    });
+  }, [updateProduct, isModalOpen]);
 
   useEffect(() => {
     const result = products.filter(
       (product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+        product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredProducts(result);
   }, [searchQuery, products]);
+  // USE EFFECTS===============================================================
+  //
+  //
+  //
+
+  const handleAddProductClick = () => {
+    setModalOpen(true);
+  };
 
 
   return (
@@ -64,14 +63,21 @@ const Products = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <ProductModal setModalOpen={setModalOpen} addProduct={addProduct} products={products}/>
+                  <ProductModal
+                    setModalOpen={setModalOpen}
+                    setUpdateProduct={setUpdateProduct}
+                    products={products}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
 
             <div className="flex w-full justify-between items-center p-4 ">
               <div className="w-1/2">
-                <SearchBar setSearchQuery={setSearchQuery} placeholder="Search Products by Name or Category"/>
+                <SearchBar
+                  setSearchQuery={setSearchQuery}
+                  placeholder="Search Products by Name or Category"
+                />
                 {/* <form className="flex flex-col ">
                   <label className="font-text">Search Products</label>
                   <input
@@ -91,7 +97,7 @@ const Products = () => {
               </motion.button>
             </div>
 
-            <ProductsTable products={filteredProducts}/>
+            <ProductsTable setUpdateProduct={setUpdateProduct} products={filteredProducts} />
           </div>
         </ProductsCard>
       </motion.div>
