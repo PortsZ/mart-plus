@@ -8,6 +8,7 @@ import Create from "./create/Create";
 import { getProducts } from "../products/getProducts";
 import { getCartById } from "./getCart";
 import { useCartStore } from "@/stores/updateCartStore";
+import { deleteAllCarts } from "./getCartItems";
 
 const Cart = () => {
   //
@@ -135,6 +136,7 @@ const Cart = () => {
               </div>
             </CartCard>
             <motion.button>
+              <div className="flex gap-3">
               <motion.button
                 whileTap={{ scale: 0.94 }}
                 whileHover={{ scale: 1.06 }}
@@ -147,6 +149,21 @@ const Cart = () => {
               >
                 Pay
               </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.94 }}
+                whileHover={{ scale: 1.06 }}
+                className="px-8 py-4 text-2xl font-bold bg-red-500 text-dark rounded"
+                type="button"
+                onClick={async () => {
+                  const res = await deleteAllCarts()
+                  console.log(res)
+                  setCart({})
+                  setUpdateCart(true);
+                }}
+              >
+                Clear all carts
+              </motion.button>
+              </div>
             </motion.button>
           </div>
 

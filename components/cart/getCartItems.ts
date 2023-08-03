@@ -19,3 +19,8 @@ export async function deleteCartItem(id: number) {
     const deletedCartItem = await axios.delete(`/api/cartItems?id=${id}`);
     return deletedCartItem.data;
 }
+
+export async function deleteAllCarts(){
+    const deleteAllCarts = await axios.delete(`/api/deleteAll`);
+    return deleteAllCarts.data;
+}

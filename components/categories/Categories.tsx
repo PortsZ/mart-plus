@@ -28,7 +28,6 @@ const Categories = () => {
 
   useEffect(() => {
     getCategories().then((data) => {
-      console.log(data);
       setCategories(data);
       setUpdateCategoryArr(false);
     });

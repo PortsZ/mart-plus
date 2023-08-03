@@ -74,13 +74,23 @@ export async function POST() {
 }
 
 export async function DELETE(request: Request) {
-  const url = new URL(request.url);
-  const id = url.searchParams.get("id");
-
-  const cart = await prisma.cart.delete({
-    where: {
-      id: Number(id),
-    },
-  });
-  return new Response(JSON.stringify(cart));
-}
+    const url = new URL(request.url);
+    const id = url.searchParams.get('id');
+  
+    // Delete all cart items associated with the cart first
+    await prisma.cartItem.deleteMany({
+      where: {
+        cartId: Number(id),
+      },
+    });
+  
+    // Then delete the cart itself
+    const cart = await prisma.cart.delete({
+      where: {
+        id: Number(id),
+      },
+    })
+    
+    return new Response(JSON.stringify(cart));
+  }
+  
