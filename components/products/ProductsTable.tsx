@@ -11,7 +11,7 @@ interface Product {
   category_id: number;
 }
 
-const ProductsTable = ({ products }: any) => {
+const ProductsTable = ({ products, setUpdateProduct }: any) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -23,15 +23,16 @@ const ProductsTable = ({ products }: any) => {
     }
   };
 
-  const updateProduct = (product: Product) => {
-    console.log(product.id);
-  };
+  
 
   return (
     <div className="p-4 rounded  w-full">
       <table className="w-full ">
         <thead className="w-full border-b-4 ">
           <tr className=" rounded">
+            <th className="text-left text-black font-sleek font-normal">
+              ID
+            </th>
             <th className="text-left text-black font-sleek font-normal">
               Name
             </th>
@@ -54,6 +55,13 @@ const ProductsTable = ({ products }: any) => {
                   product.id % 2 === 0 ? "bg-white" : "bg-background"
                 } p-2 text-black font-sleek font-normal `}
               >
+                {product.id}
+              </td>
+              <td
+                className={`${
+                  product.id % 2 === 0 ? "bg-white" : "bg-background"
+                } p-2 text-black font-sleek font-normal `}
+              >
                 {product.name}
               </td>
               <td
@@ -68,7 +76,7 @@ const ProductsTable = ({ products }: any) => {
                   product.id % 2 === 0 ? "bg-white" : "bg-background"
                 } p-2 text-black font-sleek font-normal `}
               >
-                {product.category}
+                {product.category.name}
               </td>
               <td
                 className={`${
@@ -94,7 +102,7 @@ const ProductsTable = ({ products }: any) => {
         <EditProductModal
           setModalOpen={setEditModalOpen}
           product={selectedProduct}
-          updateProduct={updateProduct} 
+          setUpdateProduct={setUpdateProduct} 
         />
       )}
     </div>

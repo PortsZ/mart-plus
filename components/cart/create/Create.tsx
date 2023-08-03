@@ -1,10 +1,11 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { motion, Variants } from "framer-motion";
 import CreateCartModal from "./CreateCartModal";
 
 import Overlay from "./Overlay";
+import { createCart } from "../getCart";
 
 const itemVariants: Variants = {
   open: {
@@ -15,14 +16,34 @@ const itemVariants: Variants = {
   closed: { opacity: 0, y: 20, transition: { duration: 0.2 } },
 };
 
-const Create = ({ addToCart, products }: any) => {
+interface CreateParams {
+  cart?: Cart;
+  setCart: (cart: Cart) => void;
+  products: Product[];
+}
+
+const Create = ({ cart, setCart, products }: CreateParams) => {
+  //
+  //
+  //
+  // STATES ===================================================
   const [isOpen, setIsOpen] = useState(false);
   const [addProductModal, setAddProductModal] = useState(false);
+  // STATES ===================================================
+  //
+  //
+  //
+  // EFFECTS ====================================================
+
+  
+  // EFFECTS ====================================================
+  //
+  //
+  //
 
   return (
     <motion.div layout className="overflow-clip">
       <div className="absolute right-0 bottom-0 z-0">
-        
         <motion.div
           className="justify-center items-center flex p-1  m-8 z-20 relative"
           whileHover={{
@@ -51,8 +72,9 @@ const Create = ({ addToCart, products }: any) => {
         <div className={" left-0 top-0  absolute z-0"}>
           <motion.div className="z-10 ">
             <CreateCartModal
-              addToCart={addToCart}
               products={products}
+              cart={cart}
+              setCart={setCart}
               closeModal={() => setAddProductModal(false)}
             />
           </motion.div>

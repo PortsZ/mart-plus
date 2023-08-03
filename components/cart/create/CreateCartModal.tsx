@@ -2,31 +2,27 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
-import { watch } from "fs";
-import SearchBar from "../search/SearchBar";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  category_id: number;
-}
+import SearchBar from "@/components/search/SearchBar";
+import { createCart, getCartById } from "../getCart";
+import { createCartItem } from "../getCartItems";
+import { useCartStore } from "@/stores/updateCartStore";
 
 interface CartModalProps {
   products: Product[];
-  addToCart: (product: Product, quantity: number) => void;
   closeModal: () => void;
+  cart?: Cart;
+  setCart: (cart: Cart) => void;
 }
 
 interface IFormInput {
   productId: string;
-  [key: string]: any; // This allows for any string as a key.
+  [key: string]: any;
 }
 
 const CreateCartModal: React.FC<CartModalProps> = ({
   products,
-  addToCart,
+  cart,
+  setCart,
   closeModal,
 }) => {
   const {
@@ -41,6 +37,7 @@ const CreateCartModal: React.FC<CartModalProps> = ({
   const [productsArray, setProductsArray] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [error, setError] = useState<Record<string, string>>({});
+  const setUpdateCart = useCartStore((state) => state.setUpdateCart);
 
   const handleAddButton = (product: Product) => {
     const quantity = watch(`quantity_${product.id}`);
@@ -50,13 +47,63 @@ const CreateCartModal: React.FC<CartModalProps> = ({
       quantity === "" ||
       quantity === null
     ) {
+      console.log("ERRO", product);
       setError({
         ...error,
-        [product.id]: "Quantity must be at least 1",
+        // [product.id]: "Quantity must be at least 1",
       });
     } else {
       setError({});
-      addToCart(product, Number(quantity));
+      //---------------------------------
+
+      if (!cart) {
+        createCart().then((data) => {
+          //==
+          const cartItem: CartItem = {
+            quantity: Number(quantity),
+            cartId: data?.id, // Assuming cart object has an id
+            productId: product.id,
+          };
+
+          createCartItem(cartItem)
+            .then(() => {
+              if (data && data.id)
+                getCartById(data.id).then((data) => {
+                  setCart(data);
+                  setUpdateCart(true);
+                });
+            })
+            .catch((err) => {
+              console.error("Failed to add item to the cart: ", err);
+            });
+
+          //==
+        });
+      }
+      //---------------------------------
+      if (cart && cart.id) {
+        console.log("ENTRÖU AQUI");
+        const cartItem: CartItem = {
+          quantity: Number(quantity),
+          cartId: cart?.id, // Assuming cart object has an id
+          productId: product.id,
+        };
+
+        createCartItem(cartItem)
+          .then(() => {
+            if (cart && cart.id)
+              getCartById(cart.id).then((data) => {
+                setCart(data);
+                setUpdateCart(true);
+              });
+          })
+          .catch((err) => {
+            console.error("Failed to add item to the cart: ", err);
+          });
+      }
+
+      setUpdateCart(true);
+      // addToCart(product, Number(quantity));
     }
   };
 
@@ -82,12 +129,16 @@ const CreateCartModal: React.FC<CartModalProps> = ({
   }, [products]);
 
   useEffect(() => {
-    const result = productsArray.filter(
-      (product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredProducts(result);
+    if (products) {
+      const result = products.filter(
+        (product) =>
+          product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.category?.name
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase())
+      );
+      setFilteredProducts(result);
+    }
   }, [searchQuery, productsArray]);
 
   //useEffects=================================================================
@@ -108,7 +159,10 @@ const CreateCartModal: React.FC<CartModalProps> = ({
         <div className="flex flex-col gap-2 w-full">
           <h2 className="text-lg font-sleek text-dark">Add to Cart</h2>
 
-          <SearchBar setSearchQuery={setSearchQuery} placeholder="Search Products by Name or Category"/>
+          <SearchBar
+            setSearchQuery={setSearchQuery}
+            placeholder="Search Products by Name or Category"
+          />
 
           <div className="p-4 rounded  w-full">
             <table className="w-full ">
@@ -153,7 +207,7 @@ const CreateCartModal: React.FC<CartModalProps> = ({
                         product.id % 2 === 0 ? "bg-white" : "bg-background"
                       } p-2 text-black font-sleek font-normal `}
                     >
-                      {product.category}
+                      {product.category.name}
                     </td>
                     <td
                       className={`${

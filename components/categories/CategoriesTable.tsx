@@ -9,7 +9,7 @@ interface Category {
   tax: number;
 }
 
-const CategoriesTable = ({updateCategory, removeCategory, categories }: any) => {
+const CategoriesTable = ({setUpdateCategoryArr, categories }: any) => {
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
@@ -28,6 +28,9 @@ const CategoriesTable = ({updateCategory, removeCategory, categories }: any) => 
       <table className="w-full ">
         <thead className="w-full border-b-4 ">
           <tr className=" rounded">
+            <th className="text-left text-black font-sleek font-normal">
+              ID
+            </th>
             <th className="text-left text-black font-sleek font-normal">
               Category Name
             </th>
@@ -48,6 +51,13 @@ const CategoriesTable = ({updateCategory, removeCategory, categories }: any) => 
                   category.id % 2 === 0 ? "bg-white" : "bg-background"
                 } p-2 text-black font-sleek font-normal `}
               >
+                {category.id}
+              </td>
+              <td
+                className={`${
+                  category.id % 2 === 0 ? "bg-white" : "bg-background"
+                } p-2 text-black font-sleek font-normal `}
+              >
                 {category.name}
               </td>
 
@@ -56,7 +66,7 @@ const CategoriesTable = ({updateCategory, removeCategory, categories }: any) => 
                   category.id % 2 === 0 ? "bg-white" : "bg-background"
                 } p-2 text-black font-sleek font-normal `}
               >
-                {category.tax * 100}%
+                {Number(category.tax * 100).toFixed(1)}%
               </td>
               <td
                 className={`${
@@ -82,8 +92,7 @@ const CategoriesTable = ({updateCategory, removeCategory, categories }: any) => 
         <EditCategoryModal
           setModalOpen={setEditModalOpen}
           category={selectedCategory}
-          updateCategory={updateCategory} 
-          removeCategory={removeCategory}
+          setUpdateCategoryArr={setUpdateCategoryArr} 
         />
       )}
     </div>

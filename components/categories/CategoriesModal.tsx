@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
+import  { createCategory } from "./getCategories";
 
 interface Category {
   name: string;
@@ -10,7 +11,7 @@ interface Category {
 
 
 
-const CategoriesModal = ({ setModalOpen, addCategory, categories }:any) => {
+const CategoriesModal = ({ setModalOpen, setUpdateCategoryArr }:any) => {
   const {
     register,
     handleSubmit,
@@ -18,10 +19,14 @@ const CategoriesModal = ({ setModalOpen, addCategory, categories }:any) => {
     formState: { errors },
   } = useForm<Category>();
 
-  const onSubmit = (data: Category) => {
-
-    const newCategory = { name: data.name, tax:data.tax/100, id: categories.length + 1 };
-    addCategory(newCategory);
+  const onSubmit = async (data: Category) => {
+    const newCategory = { name: data.name, tax:data.tax/100 };
+    try {
+      await createCategory(newCategory)
+    }catch (err) {
+      throw (err)
+    }
+    setUpdateCategoryArr(true)
     setModalOpen(false);
   };
 
